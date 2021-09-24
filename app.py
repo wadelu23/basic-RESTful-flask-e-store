@@ -11,19 +11,13 @@ from resources.user import (
 )
 from resources.item import Item, ItemList
 from resources.store import Store, StoreList
-from db import db
 from blacklist import BLACKLIST
 
 app = Flask(__name__)
 
-app.config.from_object('config.DevelopmentConfig')
+app.config.from_object('config.ProductionConfig')
 
 api = Api(app)
-
-
-@app.before_first_request
-def create_tables():
-    db.create_all()
 
 
 jwt = JWTManager(app)
@@ -95,6 +89,8 @@ api.add_resource(UserLogin, '/login')
 api.add_resource(UserLogout, '/logout')
 api.add_resource(TokenRefresh, '/refresh')
 
+
+
+
 if __name__ == '__main__':
-    db.init_app(app)
     app.run()
