@@ -22,6 +22,20 @@ def create_tables():
 
 jwt = JWTManager(app)
 
+# Using the additional_claims_loader, we can specify a method that will be
+# called when creating JWTs. The decorated method must take the identity
+# we are creating a token for and return a dictionary of additional
+# claims to add to the JWT.
+@jwt.additional_claims_loader
+def add_claims_to_jwt(identity):
+    # identity就是user.id
+    # create_access_token(identity=user.id, fresh=True)
+    # 這裡先把判斷的值(1)寫在程式碼內
+    # 實際上這值是從設定檔或是資料庫取得
+    return {
+        'is_admin': True if identity == 1 else False
+    }
+
 
 api.add_resource(Item, '/item/<string:name>')
 api.add_resource(ItemList, '/items')
