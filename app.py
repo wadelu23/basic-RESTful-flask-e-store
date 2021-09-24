@@ -11,7 +11,7 @@ from resources.user import (
 from resources.item import Item, ItemList
 from resources.store import Store, StoreList
 from db import db
-
+from blacklist import BLACKLIST
 
 app = Flask(__name__)
 
@@ -40,6 +40,12 @@ def add_claims_to_jwt(identity):
     return {
         'is_admin': True if identity == 1 else False
     }
+
+
+@jwt.token_in_blocklist_loader
+def check_if_token_in_blacklist(jwt_header, jwt_payload):
+    id_iam_looking_for = jwt_payload['sub']
+    return id_iam_looking_for in BLACKLIST
 
 
 @jwt.expired_token_loader
@@ -73,7 +79,7 @@ def token_not_fresh_callback():
 
 
 @jwt.revoked_token_loader
-def revoked_token_callback():
+def revoked_token_callback(jwt_header, jwt_payload):
     return jsonify({
         'description': 'The token has been revoked.',
         'error': 'token_revoked'
