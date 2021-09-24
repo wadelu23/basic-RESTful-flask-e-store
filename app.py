@@ -6,6 +6,7 @@ from resources.user import (
     UserRegister,
     User,
     UserLogin,
+    UserLogout,
     TokenRefresh
 )
 from resources.item import Item, ItemList
@@ -44,8 +45,7 @@ def add_claims_to_jwt(identity):
 
 @jwt.token_in_blocklist_loader
 def check_if_token_in_blacklist(jwt_header, jwt_payload):
-    id_iam_looking_for = jwt_payload['sub']
-    return id_iam_looking_for in BLACKLIST
+    return jwt_payload['jti'] in BLACKLIST
 
 
 @jwt.expired_token_loader
@@ -92,6 +92,7 @@ api.add_resource(StoreList, '/stores')
 api.add_resource(UserRegister, '/register')
 api.add_resource(User, '/user/<int:user_id>')
 api.add_resource(UserLogin, '/login')
+api.add_resource(UserLogout, '/logout')
 api.add_resource(TokenRefresh, '/refresh')
 
 if __name__ == '__main__':
