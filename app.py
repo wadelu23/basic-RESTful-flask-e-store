@@ -12,15 +12,20 @@ from resources.user import (
 from resources.item import Item, ItemList
 from resources.store import Store, StoreList
 from blacklist import BLACKLIST
+from db import db
 
 app = Flask(__name__)
 
-app.config.from_object('config.ProductionConfig')
+app.config.from_object('config.DevelopmentConfig')
 
 api = Api(app)
 
 
 jwt = JWTManager(app)
+
+@app.before_first_request
+def create_tables():
+    db.create_all()
 
 # Using the additional_claims_loader, we can specify a method that will be
 # called when creating JWTs. The decorated method must take the identity
@@ -93,4 +98,5 @@ api.add_resource(TokenRefresh, '/refresh')
 
 
 if __name__ == '__main__':
+    db.init_app(app)
     app.run()
