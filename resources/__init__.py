@@ -1,7 +1,7 @@
 from flask_restx import Api
 
 from .user import api as user_api
-# from .dog import api as dog_api
+from .item import api as item_api
 
 authorizations = {
     'apikey': {
@@ -19,4 +19,4 @@ api = Api(
 )
 
 api.add_namespace(user_api)
-# api.add_namespace(dog_api)
+api.add_namespace(item_api)
