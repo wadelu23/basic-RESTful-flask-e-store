@@ -1,27 +1,17 @@
 from flask import Flask, jsonify
-from flask_restful import Api
 from flask_jwt_extended import JWTManager
-
-from resources.user import (
-    UserRegister,
-    User,
-    UserLogin,
-    UserLogout,
-    TokenRefresh
-)
-from resources.item import Item, ItemList
-from resources.store import Store, StoreList
 from blacklist import BLACKLIST
 from db import db
+from resources import api
 
 app = Flask(__name__)
 
 app.config.from_object('config.DevelopmentConfig')
 
-api = Api(app)
-
+api.init_app(app)
 
 jwt = JWTManager(app)
+
 
 @app.before_first_request
 def create_tables():
@@ -31,6 +21,8 @@ def create_tables():
 # called when creating JWTs. The decorated method must take the identity
 # we are creating a token for and return a dictionary of additional
 # claims to add to the JWT.
+
+
 @jwt.additional_claims_loader
 def add_claims_to_jwt(identity):
     # identity就是user.id
@@ -54,12 +46,14 @@ def expired_token_callback():
         'error': 'token_expired'
     }), 401
 
+
 @jwt.invalid_token_loader
 def invalid_token_callback(error):
     return jsonify({
         'message': 'Signature verification failed.',
         'error': 'invalid_token'
     }), 401
+
 
 @jwt.unauthorized_loader
 def missing_token_callback(error):
@@ -83,18 +77,6 @@ def revoked_token_callback(jwt_header, jwt_payload):
         'description': 'The token has been revoked.',
         'error': 'token_revoked'
     }), 401
-
-api.add_resource(Item, '/item/<string:name>')
-api.add_resource(ItemList, '/items')
-api.add_resource(Store, '/store/<string:name>')
-api.add_resource(StoreList, '/stores')
-api.add_resource(UserRegister, '/register')
-api.add_resource(User, '/user/<int:user_id>')
-api.add_resource(UserLogin, '/login')
-api.add_resource(UserLogout, '/logout')
-api.add_resource(TokenRefresh, '/refresh')
-
-
 
 
 if __name__ == '__main__':
