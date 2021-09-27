@@ -1,17 +1,67 @@
-from flask_restful import Resource
+from flask_restx import (
+    Resource,
+    reqparse,
+    fields,
+    Namespace
+)
+from flask_restx.marshalling import marshal
 from models.store import StoreModel
+from models.item import ItemModel
 
 
+api = Namespace("stores",
+                description="Stores related operations")
+
+_item_list = api.model('_item_list', {
+    'id': fields.Integer(
+        readonly=True,
+        description="The user identifier"
+    ),
+    'name': fields.String(
+        required=True,
+        description="The item name"
+    ),
+    'price': fields.Integer(
+        required=True,
+        description="The item price"
+    ),
+})
+
+_store_list = api.model('_store_list', {
+    'id': fields.Integer(
+        readonly=True,
+        description="The user identifier"
+    ),
+    'name': fields.String(
+        required=True,
+        description="The store name"
+    ),
+    'items': fields.List(
+        fields.Nested(_item_list),
+        description="The store's item"
+    ),
+})
+
+
+@api.route('/<name>')
 class Store(Resource):
+    @api.response(404, 'Store not found.')
+    @api.marshal_with(_store_list)
     def get(self, name):
+        """get a store"""
         store = StoreModel.find_by_name(name)
         if store:
-            return store.json()
-        return {'message': 'Store not found.'}, 404
+            return store
+        api.abort(404)
+        return
 
+    @api.response(201, 'Success')
+    @api.response(400, 'store name already exists')
     def post(self, name):
+        """create a store"""
         if StoreModel.find_by_name(name):
-            return {'message': "A store with name '{}' already exists.".format(name)}, 400
+            api.abort(404, "A store with name '{}' already exists.".format(name))
+            return
 
         store = StoreModel(name)
         try:
@@ -19,9 +69,10 @@ class Store(Resource):
         except:
             return {"message": "An error occurred while creating the store."}, 500
 
-        return store.json(), 201
+        return marshal(store, _store_list), 201
 
     def delete(self, name):
+        """delete store"""
         store = StoreModel.find_by_name(name)
 
         if store:
@@ -30,6 +81,9 @@ class Store(Resource):
         return {'message': 'Store deleted'}
 
 
+@api.route('/')
 class StoreList(Resource):
+    @api.marshal_with(_store_list)
     def get(self):
-        return {'stores': [store.json() for store in StoreModel.find_all()]}
+        """list all stores"""
+        return StoreModel.find_all()
