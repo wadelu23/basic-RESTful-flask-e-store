@@ -48,7 +48,7 @@ class UserRegister(Resource):
         data = _user_parser.parse_args()
 
         if UserModel.find_by_username(data['username']):
-            api.abort(400,'that username already exists.')
+            api.abort(400, 'that username already exists.')
             return
 
         user = UserModel(**data)
@@ -79,7 +79,7 @@ class User(Resource):
         """get a user"""
         user = UserModel.find_by_id(user_id)
         if not user:
-            api.abort(404,"User not found")
+            api.abort(404, "User not found")
             return
         return user, 200
 
@@ -88,10 +88,11 @@ class User(Resource):
         """Delete user"""
         user = UserModel.find_by_id(user_id)
         if not user:
-            api.abort(404,'User not found')
+            api.abort(404, 'User not found')
             return
         user.delete_from_db()
         return {'message': 'User deleted.'}, 200
+
 
 @api.route('/login')
 @api.response(401, "Invalid Credentials!")
@@ -114,6 +115,7 @@ class UserLogin(Resource):
 
         return {"message": "Invalid Credentials!"}, 401
 
+
 @api.route('/logout')
 class UserLogout(Resource):
     @api.doc(security='apikey')
@@ -125,6 +127,7 @@ class UserLogout(Resource):
         return {
             'message': 'Successfuly Logged out.'
         }, 200
+
 
 @api.route('/refresh')
 class TokenRefresh(Resource):
