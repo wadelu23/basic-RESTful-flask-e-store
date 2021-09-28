@@ -74,7 +74,7 @@ class UserList(Resource):
 @api.param("user_id", "The user identifier")
 @api.response(404, "User not found")
 class User(Resource):
-    @api.marshal_list_with(_user_list)
+    @api.marshal_with(_user_list)
     def get(self, user_id):
         """get a user"""
         user = UserModel.find_by_id(user_id)
