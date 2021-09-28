@@ -1,12 +1,16 @@
+import os
 from flask import Flask, jsonify
 from flask_jwt_extended import JWTManager
 from blacklist import BLACKLIST
 from db import db
 from resources import api
+from config import config
 
 app = Flask(__name__)
 
-app.config.from_object('config.DevelopmentConfig')
+flask_env = os.environ.get('FLASK_ENV') or 'default'
+
+app.config.from_object(config[flask_env])
 
 api.init_app(app)
 

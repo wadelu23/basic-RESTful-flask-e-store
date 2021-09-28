@@ -1,5 +1,5 @@
 import os
-import re
+
 
 class Config(object):
     DEBUG = False
@@ -24,9 +24,17 @@ class DevelopmentConfig(Config):
     ENV = "development"
     SECRET_KEY = "Development_SECRET_KEY"
     DEBUG = True
-    # SQLALCHEMY_DATABASE_URI = 開發用輕量資料庫
+    # SQLALCHEMY_DATABASE_URI = 開發用輕量資料庫(如SQLite)
 
 
 class TestingConfig(Config):
     TESTING = True
-    # SQLALCHEMY_DATABASE_URI = 測試用(記憶體)資料庫
+    # SQLALCHEMY_DATABASE_URI = 測試用資料庫(如記憶體資料庫)
+
+
+config = {
+    'production': ProductionConfig,
+    'development': DevelopmentConfig,
+    'default': DevelopmentConfig,
+    'testing': TestingConfig
+}
