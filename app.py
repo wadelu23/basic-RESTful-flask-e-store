@@ -2,7 +2,6 @@ import os
 from flask import Flask, jsonify
 from flask_jwt_extended import JWTManager
 from blacklist import BLACKLIST
-from db import db
 from resources import api
 from config import config
 
@@ -16,10 +15,6 @@ api.init_app(app)
 
 jwt = JWTManager(app)
 
-
-@app.before_first_request
-def create_tables():
-    db.create_all()
 
 # Using the additional_claims_loader, we can specify a method that will be
 # called when creating JWTs. The decorated method must take the identity
@@ -84,5 +79,4 @@ def revoked_token_callback(jwt_header, jwt_payload):
 
 
 if __name__ == '__main__':
-    db.init_app(app)
     app.run()
