@@ -21,7 +21,7 @@ _item_list = api.model('_item_list', {
         required=True,
         description="The item name"
     ),
-    'price': fields.Integer(
+    'price': fields.Float(
         required=True,
         description="The item price"
     ),
